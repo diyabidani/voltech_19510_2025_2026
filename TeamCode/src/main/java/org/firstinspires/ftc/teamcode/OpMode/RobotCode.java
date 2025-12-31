@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="RobotCode")
 public class RobotCode extends OpMode {
@@ -17,14 +18,40 @@ public class RobotCode extends OpMode {
     private DcMotor outtakeMotor;
 
     // Axon Mini (continuous rotation servo)
-    private CRServo axonMini;
+    //wrong.
+//    private CRServo axonMini;
 
+    private Servo kicker, spindexer;
     // Toggle states
     private boolean intakeToggle = false;
     private boolean prevRB = false;
 
     private boolean outtakeToggle = false;
     private boolean prevB = false;
+
+    //change the vvalues on thesse positions
+    public enum spindexerPositions{
+        FIRST(0),
+        SECOND(0.3), //was 0.3 but vartype was bugging
+        THIRD(0.7);
+
+        public double value;
+
+        spindexerPositions(double pos){
+            this.value = pos;
+        }
+    }
+
+    public enum kickerPositions{
+        DOWN(0),
+        UP(0.3); //was 0.3 but vartype was bugging
+
+        public double value;
+
+        kickerPositions(double pos){
+            this.value = pos;
+        }
+    }
 
     private boolean prevLB = false;
 
@@ -44,10 +71,12 @@ public class RobotCode extends OpMode {
         intakeMotor = hardwareMap.get(DcMotor.class, "intake_motor");
         outtakeMotor = hardwareMap.get(DcMotor.class, "outtake_motor");
 
-        // Axon Mini CR servo
-        axonMini = hardwareMap.get(CRServo.class, "axon_mini");
-        axonMini.setPower(0.5); // STOP
+//        // Axon Mini CR servo
+//        axonMini = hardwareMap.get(CRServo.class, "axon_mini");
+//        axonMini.setPower(0.5); // STOP
 
+        kicker = hardwareMap.get(Servo.class, "kicker");
+        spindexer = hardwareMap.get(Servo.class, "spindexer");
         // Motor directions
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);   // CCW default
         outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);  // CCW
@@ -113,30 +142,49 @@ public class RobotCode extends OpMode {
 
         outtakeMotor.setPower(outtakeToggle ? 1.0 : 0.0);
 
+        //spindexer
+        if(gamepad1.y){
+            spindexer.setPosition(spindexerPositions.FIRST.value);
+        }
+        if(gamepad1.x){
+            spindexer.setPosition(spindexerPositions.SECOND.value);
+        }
+        if(gamepad1.a){
+            spindexer.setPosition(spindexerPositions.THIRD.value);
+        }
+
+        //kicker
+        if(gamepad1.dpad_up){
+            kicker.setPosition(kickerPositions.UP.value);
+        }
+        if(gamepad1.dpad_down){
+            kicker.setPosition(kickerPositions.DOWN.value);
+        }
 
         // ------------------ AXON MINI KICK (LB) ------------------
-        boolean lbPressed = gamepad1.left_bumper;
+        //i dont liek ts code so im changing it
+//        boolean lbPressed = gamepad1.left_bumper;
 
-        if (lbPressed && !prevLB) {
-            // KICK UP (fast rotation)
-            axonMini.setPower(1.0);   // adjust direction if needed
-            sleep(150);               // adjust to get ~120 degrees
-
-            // KICK DOWN (fast rotation back)
-            axonMini.setPower(0.0);   // opposite direction
-            sleep(150);
-
-            // STOP
-            axonMini.setPower(0.5);
-        }
-        prevLB = lbPressed;
+//        if (lbPressed && !prevLB) {
+//            // KICK UP (fast rotation)
+//            axonMini.setPower(1.0);   // adjust direction if needed
+//            sleep(150);               // adjust to get ~120 degrees
+//
+//            // KICK DOWN (fast rotation back)
+//            axonMini.setPower(0.0);   // opposite direction
+//            sleep(150);
+//
+//            // STOP
+//            axonMini.setPower(0.5);
+//        }
+//        prevLB = lbPressed;
 
 
         // ------------------ TELEMETRY ------------------
         telemetry.addData("Intake Toggle", intakeToggle);
         telemetry.addData("Intake Dir", rtHeld ? "CLOCKWISE" : (intakeToggle ? "COUNTER-CLOCKWISE" : "OFF"));
         telemetry.addData("Outtake Toggle", outtakeToggle);
-        telemetry.addData("Axon Mini", lbPressed ? "KICK" : "READY");
+//        telemetry.addData("Axon Mini", lbPressed ? "KICK" : "READY");
         telemetry.update();
     }
 
