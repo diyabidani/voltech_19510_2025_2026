@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="RobotCode")
 public class RobotCode extends OpMode {
@@ -22,6 +25,11 @@ public class RobotCode extends OpMode {
 //    private CRServo axonMini;
 
     private Servo kicker, spindexer;
+
+    // Color Sensor
+    private ColorSensor colorSensor;
+    private DistanceSensor distanceSensor;
+
     // Toggle states
     private boolean intakeToggle = false;
     private boolean prevRB = false;
@@ -77,6 +85,11 @@ public class RobotCode extends OpMode {
 
         kicker = hardwareMap.get(Servo.class, "kicker");
         spindexer = hardwareMap.get(Servo.class, "spindexer");
+
+        // Color Sensor (REV Color Sensor V3)
+        colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "color_sensor");
+
         // Motor directions
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);   // CCW default
         outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);  // CCW
@@ -179,13 +192,60 @@ public class RobotCode extends OpMode {
 //        }
 //        prevLB = lbPressed;
 
+        // ------------------ COLOR SENSOR DETECTION ------------------
+        String ballColor = detectBallColor();
 
         // ------------------ TELEMETRY ------------------
         telemetry.addData("Intake Toggle", intakeToggle);
         telemetry.addData("Intake Dir", rtHeld ? "CLOCKWISE" : (intakeToggle ? "COUNTER-CLOCKWISE" : "OFF"));
         telemetry.addData("Outtake Toggle", outtakeToggle);
 //        telemetry.addData("Axon Mini", lbPressed ? "KICK" : "READY");
+
+        // Color sensor telemetryryryryy
+        telemetry.addData("Ball Detected", ballColor);
+        telemetry.addData("RGB", "R: %d, G: %d, B: %d",
+                colorSensor.red(), colorSensor.green(), colorSensor.blue());
+        telemetry.addData("Distance", "%.2f cm", distanceSensor.getDistance(DistanceUnit.CM));
+
         telemetry.update();
+    }
+
+    /**
+     * color sensor ts stuf
+     * rev robotics color sensor v3
+     * **/
+    private String detectBallColor() {
+       //rgb val
+        int red = colorSensor.red();
+        int green = colorSensor.green();
+        int blue = colorSensor.blue();
+
+        //distance calc ahhh
+        double distance = distanceSensor.getDistance(DistanceUnit.CM);
+        if (distance > 3.0) {  // No ball over sensor
+            return "NOT DETECTED";
+        }
+
+        // CALC CALC CALC AHAHAHAHH
+        int totalBrightness = red + green + blue;
+        if (totalBrightness < 150) {  // Too dark, no ball present
+            return "NOT DETECTED";
+        }
+
+        // irish spring greeenahh color
+        // higher greeen val
+        if (green > red * 1.2 && green > blue * 1.2 && green > 80) {
+            return "GREEN";
+        }
+
+        // purple ball
+        // high puprle ifkykfkwanim
+        if (red > green * 1.2 && blue > green * 1.2 && (red + blue) > 150) {
+            return "PURPLE";
+        }
+
+        // neither pspspsptbvfrovjsdflkjvnwelrkjnfs
+        return "NOT DETECTED";
     }
 
     private void sleep(long ms) {
