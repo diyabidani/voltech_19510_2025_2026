@@ -17,15 +17,12 @@ public class ColorSensorTest extends OpMode {
 
     @Override
     public void loop() {
-        if(sensor.green()>sensor.red()&& sensor.green()>sensor.blue()){
+        if((sensor.alpha()>50&&sensor.green()>sensor.blue()&&sensor.red()<45)){
             telemetry.addData("GREEN", "");
-        } else if(sensor.blue()>sensor.green()&&sensor.blue()>sensor.red()){
+        } else if((sensor.alpha()>50&&sensor.blue()>sensor.green())){
             telemetry.addData("PURPLE", "");
-        }
-        if(sensor.alpha()>50){
-            telemetry.addData("BALL DETECTED", "");
-        }else{
-            telemetry.addData("NO BALL DETECTED", "");
+        } else{
+            telemetry.addData("no ball detected: ", "");
         }
         telemetry.addData("green: ", sensor.green());
         telemetry.addData("red: ", sensor.red());
