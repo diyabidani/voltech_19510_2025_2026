@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -188,6 +187,17 @@ public class RobotCode extends OpMode {
         if (!detections.isEmpty()) {
             AprilTagDetection tag = detections.get(0);
             telemetry.addData("Tag ID", tag.id);
+
+            if (tag.id == 21) {
+                telemetry.addLine("1");
+                telemetry.addLine("GPP");
+            } else if (tag.id == 22) {
+                telemetry.addLine("2");
+                telemetry.addLine("PGP");
+            } else if (tag.id == 33) {
+                telemetry.addLine("3");
+                telemetry.addLine("PPG");
+            }
 
             if (tag.ftcPose != null) {
                 telemetry.addData(
