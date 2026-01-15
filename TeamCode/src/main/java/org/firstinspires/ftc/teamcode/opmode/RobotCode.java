@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,9 +10,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@TeleOp(name = "RobotCode")
+import java.util.List;
+
+@TeleOp(name = "RobotCode", group = "TeleOp")
 public class RobotCode extends OpMode {
 
     // ------------------ DRIVETRAIN ------------------
@@ -19,7 +27,6 @@ public class RobotCode extends OpMode {
     // ------------------ MECHANISMS ------------------
     private DcMotor intakeMotor;
     private DcMotor outtakeMotor;
-
     private Servo kicker;
     private Servo spindexer;
 
@@ -30,33 +37,31 @@ public class RobotCode extends OpMode {
     // ------------------ TOGGLES ------------------
     private boolean intakeToggle = false;
     private boolean outtakeToggle = false;
-
     private boolean prevRB = false;
     private boolean prevB = false;
 
     // ------------------ ENUMS ------------------
     public enum SpindexerPositions {
-        FIRST(0.0),
-        SECOND(0.3),
-        THIRD(0.7);
-
+        FIRST(0.0), SECOND(0.3), THIRD(0.7);
         public final double value;
         SpindexerPositions(double value) { this.value = value; }
     }
 
     public enum KickerPositions {
-        DOWN(0.0),
-        UP(0.3);
-
+        DOWN(0.0), UP(0.3);
         public final double value;
         KickerPositions(double value) { this.value = value; }
     }
+
+    // ------------------ VISION ------------------
+    private VisionPortal visionPortal;
+    private AprilTagProcessor aprilTagProcessor;
 
     // ------------------ INIT ------------------
     @Override
     public void init() {
 
-        // Drivetrain
+        // --------- Drivetrain ----------
         frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
         frontRight = hardwareMap.get(DcMotor.class, "front_right");
         backLeft   = hardwareMap.get(DcMotor.class, "back_left");
@@ -65,25 +70,38 @@ public class RobotCode extends OpMode {
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Motors
+        // --------- Mechanisms ----------
         intakeMotor  = hardwareMap.get(DcMotor.class, "intake_motor");
         outtakeMotor = hardwareMap.get(DcMotor.class, "outtake_motor");
 
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Servos
         kicker = hardwareMap.get(Servo.class, "kicker");
         spindexer = hardwareMap.get(Servo.class, "spindexer");
 
         kicker.setPosition(KickerPositions.DOWN.value);
         spindexer.setPosition(SpindexerPositions.FIRST.value);
 
-        // Color sensor (REV V3)
+        // --------- Sensors ----------
         colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "color_sensor");
 
-        telemetry.addLine("Initialized");
+        // --------- Vision ----------
+        aprilTagProcessor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .build();
+
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(640, 480))
+                .addProcessor(aprilTagProcessor)
+                .build();
+
+        telemetry.addLine("Robot + AprilTag Vision Initialized");
         telemetry.update();
     }
 
@@ -156,12 +174,31 @@ public class RobotCode extends OpMode {
         telemetry.addData("Red", colorSensor.red());
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue", colorSensor.blue());
-        telemetry.addData("Distance (cm)",
-                "%.2f", distanceSensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("Distance (cm)", "%.2f", distanceSensor.getDistance(DistanceUnit.CM));
 
         telemetry.addLine("----------------------");
         telemetry.addData("Intake", intakeToggle);
         telemetry.addData("Outtake", outtakeToggle);
+
+        // ---------- APRILTAG DETECTION ----------
+        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+        telemetry.addLine("---- APRILTAG DETECTION ----");
+        telemetry.addData("AprilTags detected", detections.size());
+
+        if (!detections.isEmpty()) {
+            AprilTagDetection tag = detections.get(0);
+            telemetry.addData("Tag ID", tag.id);
+
+            if (tag.ftcPose != null) {
+                telemetry.addData(
+                        "Pose (X,Y,Z)",
+                        "%.1f, %.1f, %.1f",
+                        tag.ftcPose.x,
+                        tag.ftcPose.y,
+                        tag.ftcPose.z
+                );
+            }
+        }
 
         telemetry.update();
     }
@@ -178,6 +215,14 @@ public class RobotCode extends OpMode {
             return "GREEN";
         } else {
             return "PURPLE";
+        }
+    }
+
+    // ------------------ STOP ------------------
+    @Override
+    public void stop() {
+        if (visionPortal != null) {
+            visionPortal.close();
         }
     }
 }
