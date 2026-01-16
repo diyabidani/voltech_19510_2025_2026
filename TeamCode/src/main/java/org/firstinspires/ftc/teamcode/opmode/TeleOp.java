@@ -48,15 +48,15 @@ public class TeleOp extends OpMode {
 
     @Override
     public void init(){
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(0,0,0));
-        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
-                .setBrakingStart(1)
-                .setBrakingStrength(1)
-                .build();
-        follower.update();
+//        follower = Constants.createFollower(hardwareMap);
+//        follower.setStartingPose(new Pose(0,0,0));
+//        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+//                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
+//                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+//                .setBrakingStart(1)
+//                .setBrakingStrength(1)
+//                .build();
+//        follower.update();
         outtake = new Outtake(hardwareMap);
         intake = new Intake(hardwareMap);
         spindexer = new JankIndexer(hardwareMap);
@@ -66,15 +66,15 @@ public class TeleOp extends OpMode {
 
     @Override
     public void start(){
-        follower.startTeleopDrive();
-        follower.update();
+//        follower.startTeleopDrive();
+//        follower.update();
     }
 
     @Override
     public void loop(){
         //drive
-        follower.setTeleOpDrive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, true);
-        follower.update();
+//        follower.setTeleOpDrive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, true);
+//        follower.update();
 
         //intake
         intake.run(gamepad1);
