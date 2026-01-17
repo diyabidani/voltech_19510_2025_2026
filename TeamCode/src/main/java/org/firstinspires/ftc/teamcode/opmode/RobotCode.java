@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -19,7 +18,7 @@ public class RobotCode extends OpMode {
 
     // ------------------ MECHANISMS ------------------
     private DcMotor intakeMotor;
-    private DcMotorEx outtakeMotor;
+    private DcMotor outtakeMotor;
 
     private Servo kicker;
     private Servo spindexer;
@@ -68,7 +67,7 @@ public class RobotCode extends OpMode {
 
         // Motors
         intakeMotor  = hardwareMap.get(DcMotor.class, "intake_motor");
-        outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtake_motor");
+        outtakeMotor = hardwareMap.get(DcMotor.class, "outtake_motor");
 
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -163,7 +162,7 @@ public class RobotCode extends OpMode {
         telemetry.addLine("----------------------");
         telemetry.addData("Intake", intakeToggle);
         telemetry.addData("Outtake", outtakeToggle);
-        telemetry.addData("outtake velocity: ", outtakeMotor.getVelocity());
+
         telemetry.update();
     }
 
