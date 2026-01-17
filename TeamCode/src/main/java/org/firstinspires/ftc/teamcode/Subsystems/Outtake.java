@@ -31,7 +31,7 @@ public class Outtake {
         boolean rb = gm.right_bumper;
         if (rb && !prevRB) outtakeToggle = !outtakeToggle;
         prevRB = rb;
-        outtake.setVelocity(outtakeToggle ? -2800 : 0.0);
+        outtake.setVelocity(outtakeToggle ? -1800 : 0.0);
     }
 
     public double velocity(double distance){

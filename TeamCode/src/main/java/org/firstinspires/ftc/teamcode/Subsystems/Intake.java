@@ -35,9 +35,9 @@ public class Intake {
         if (lb && !prevLB) intakeToggle = !intakeToggle;
         prevLB = lb;
         if (gm.left_trigger > 0) {
-            intake.setPower(1.0);
+            intake.setPower(-0.6);
         } else {
-            intake.setPower(intakeToggle ? -1.0 : 0.0);
+            intake.setPower(intakeToggle ? 0.6 : 0.0);
         }
     }
 
