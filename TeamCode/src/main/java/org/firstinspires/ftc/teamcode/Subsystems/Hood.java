@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Hood {
 
     public Servo hood;
-    public double up = 0.2;
-    public double down = 0.45;
+    public double up = 0.25;
+    public double down = 0.37;
     public boolean prevA;
     public boolean hoodToggle;
 

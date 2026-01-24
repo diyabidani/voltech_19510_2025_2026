@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.AutomatedOuttake;
+import org.firstinspires.ftc.teamcode.Subsystems.Hood;
 import org.firstinspires.ftc.teamcode.Subsystems.Indexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.JankIndexer;
@@ -33,6 +34,7 @@ public class TeleOp extends OpMode {
     Kicker kicker;
     ElapsedTime timer = new ElapsedTime();
     DistanceSensor sensor, sensor2;
+    Hood hood;
 
     //intake
     private boolean prevLB = false;
@@ -66,6 +68,7 @@ public class TeleOp extends OpMode {
         kicker = new Kicker(hardwareMap);
         sensor = hardwareMap.get(DistanceSensor.class, "sensor");
         sensor2 = hardwareMap.get(DistanceSensor.class, "sensor2");
+        hood = new Hood(hardwareMap);
     }
 
     @Override
@@ -74,12 +77,13 @@ public class TeleOp extends OpMode {
         follower.update();
         spindexer.setPos1();
         kicker.kicker.setPosition(kicker.down);
+        hood.hood.setPosition(hood.up);
     }
 
     @Override
     public void loop(){
         //drive
-        follower.setTeleOpDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, true);
+        follower.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
         //intake
@@ -88,6 +92,14 @@ public class TeleOp extends OpMode {
 
         //outtake
         outtake.runAutomated(kicker, spindexer, gamepad1);
+
+        //hood
+        hood.run(gamepad1);
+        if(hood.hood.getPosition()==hood.down){
+            outtake.speed = -1800;
+        } else if(hood.hood.getPosition()==hood.up){
+            outtake.speed = -2000;
+        }
 
         //indexer
 //        boolean a = gamepad1.a;

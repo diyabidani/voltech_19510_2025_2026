@@ -16,7 +16,7 @@ public class Indexer {
 //    private ColorSensor sensor;
     public ElapsedTime timer;
 
-    public double[] positions = new double[]{0.15,0.30,0.45};
+    public double[] positions = new double[]{0.22,0.37,0.52};
 //    public double indx1 = 0.15; //slot 1 intake, slot 2 outtake
 //    public double indx2 = 0.43; //slot 2 intake, slot 3 outtake
 //    public double indx3 = 0.69; //slot 3 intake, slot 1 outtake
@@ -38,11 +38,10 @@ public class Indexer {
     }
 
     public void runIntake(DistanceSensor sensor, DistanceSensor sensor2){
-        if((sensor.getDistance(DistanceUnit.MM)<37)||(sensor2.getDistance(DistanceUnit.MM)<37)){
+        if((sensor2.getDistance(DistanceUnit.MM)<37)||(sensor.getDistance(DistanceUnit.MM)<50)){
             time = timer.milliseconds();
         }
         if(timer.milliseconds()>time+10){
-            time = 200000;
             slots[currentIndxPos] = 1;
             //turn spindexer
             if(currentIndxPos!=2){
@@ -52,6 +51,7 @@ public class Indexer {
                 spindexer.setPosition(positions[0]);
                 currentIndxPos = 0;
             }
+            time = 200000;
         }
     }
 

@@ -11,7 +11,8 @@ public class AutomatedOuttake {
     public ElapsedTime timer = new ElapsedTime();
     public double time = 200000;
     public boolean isOn = false;
-    int i;
+    public int i;
+    public double speed = -1800;
 
     public AutomatedOuttake(HardwareMap hardwareMap){
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
@@ -24,17 +25,17 @@ public class AutomatedOuttake {
         }
         if(isOn){
             if(i < 3){
-                outtake.setVelocity(-1800);
+                outtake.setVelocity(speed);
                 if(timer.milliseconds()>time+900){
                     spindexer.runOuttake();
                     i += 1;
                     time = 200000;
-                } else if(timer.milliseconds()>time+600){
+                } else if(timer.milliseconds()>time+700){
                     kicker.kicker.setPosition(kicker.down);
-                } else if(timer.milliseconds()>time+300){
+                } else if(timer.milliseconds()>time+400){
                     kicker.kicker.setPosition(kicker.up);
                 } else if(time == 200000){
-                    if((outtake.getVelocity()<-1600)&&(outtake.getVelocity()>-2000)){
+                    if((outtake.getVelocity()<speed+200)&&(outtake.getVelocity()>speed-200)){
                         time = timer.milliseconds();
                     }
                 }
@@ -44,26 +45,28 @@ public class AutomatedOuttake {
                 i = 0;
             }
         }
+    }
 
-//        if(isOn){
-//            outtake.setVelocity(-1800);
-//            if((outtake.getVelocity()<-1600)&&(outtake.getVelocity()>-2000)){
-//                time = timer.milliseconds();
-//                if(timer.milliseconds()>time+4000){
-//                    kicker.kicker.setPosition(kicker.down);
-//                    spindexer.runOuttake();
-//                    i += 1;
-//                } else if(timer.milliseconds()>time+2000){
-//                    kicker.kicker.setPosition(kicker.down);
-//                } else{
-//                    kicker.kicker.setPosition(kicker.up);
-//                }
-//            } else if(i>=3){
-//                outtake.setVelocity(0);
-//                isOn = false;
-//                i = 0;
-//            }
-//        }
+    public void runAuton(Kicker kicker, Indexer spindexer){
+        if(i < 3){
+            outtake.setVelocity(speed);
+            if(timer.milliseconds()>time+900){
+                spindexer.runOuttake();
+                i += 1;
+                time = 200000;
+            } else if(timer.milliseconds()>time+700){
+                kicker.kicker.setPosition(kicker.down);
+            } else if(timer.milliseconds()>time+400){
+                kicker.kicker.setPosition(kicker.up);
+            } else if(time == 200000){
+                if((outtake.getVelocity()<-1800)&&(outtake.getVelocity()>-2200)){
+                    time = timer.milliseconds();
+                }
+            }
+        } else{
+            outtake.setVelocity(0);
+            i = 0;
+        }
     }
 
     public void singleArtifact(Kicker kicker, Indexer spindexer){

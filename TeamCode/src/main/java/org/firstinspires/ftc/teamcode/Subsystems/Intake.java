@@ -8,27 +8,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Intake {
 
     public DcMotorEx intake;
-    public boolean isOn = false;
     public boolean prevIsOn = true;
 
     public boolean prevLB;
     public boolean intakeToggle;
+    public boolean isOn = false;
 
     public Intake(HardwareMap hardwareMap){
         intake = hardwareMap.get(DcMotorEx.class, "intake");
     }
-
-//    public void run(){
-//        if(!isOn){
-////            prevIsOn = isOn;
-//            isOn = true;
-//            intake.setPower(-1);
-//        } else{
-////            prevIsOn = isOn;
-//            isOn = false;
-//            intake.setPower(0);
-//        }
-//    }
 
     public void run(Gamepad gm){
         boolean lb = gm.left_bumper;
@@ -40,8 +28,4 @@ public class Intake {
             intake.setPower(intakeToggle ? 0.6 : 0.0);
         }
     }
-
-//    public void runReverse(){
-//        intake.setPower(1);
-//    }
 }
